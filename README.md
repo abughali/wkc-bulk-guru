@@ -1,6 +1,6 @@
 # Watson Knowledge Catalog (WKC) Bulk Guru
 
-This repo demonstrates how the WKC API can be used to perform quick updates in bulk for some laborous tasks when done through the UI.
+This repo demonstrates how the WKC API can be used to perform quick updates in bulk for some laborious tasks when done through the UI.
 
 ## Installation
 
