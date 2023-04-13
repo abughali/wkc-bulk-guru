@@ -2,6 +2,15 @@
 
 This repo demonstrates how the WKC API can be used to perform quick updates in bulk for some laborious tasks when done through the UI.
 
+## Prerequisites and Recommended Tools
+
+- Cloud Pak for Data `4.0` or above
+- Github Desktop <https://desktop.github.com/>
+- Git (optional for integration with VSC) <https://git-scm.com/downloads>
+- Python `3.8` or above <https://www.python.org/downloads/>
+- Visual Studio Code (VSC) <https://code.visualstudio.com/>
+- Python Extension of VSC <https://code.visualstudio.com/docs/python/python-tutorial>
+
 ## Installation
 
 1. Make sure the prerequisites are installed.
@@ -21,8 +30,8 @@ cp .envExample .env
 
 ### Swagger UIs and other API docs
 
-- <https://{hostname}/v3/search/api/explorer>
-
+- <https://{cp4d_hostname}/v3/search/api/explorer>
+- <https://cloud.ibm.com/apidocs/watson-data-api>
 
 ### Programming resources
 
