@@ -64,7 +64,10 @@ def authorize():
         raise ValueError(f"Error authenticating...\nResponse code: {response.status_code}\nResponse text:{response.text}")
 
 
-
+"""
+The function retrieves a list of data assets in a specified catalog using a search API.
+It returns the catalog_assets list containing information about all data assets in the catalog.
+"""
 def scanCatalogDataAssets(catalog_id):
     catalog_assets = []
     remaining_assets_to_get = -1
@@ -105,18 +108,27 @@ def scanCatalogDataAssets(catalog_id):
     
     return catalog_assets
 
+""" This function retrieves metadata for a specified data asset within a catalog
+Parameters:
+    catalog_id (str): ID of the catalog containing the asset
+    asset_id (str): ID of the asset to retrieve metadata for
+Returns:
+    dict: JSON data containing metadata for the specified asset
+Raises:
+    ValueError: if there is an error retrieving the asset metadata
+Usage:
+    asset_data = scanDataAsset('catalog_id', 'asset_id')
+"""
 def scanDataAsset(catalog_id, asset_id):
-    asset_columns = []
 
-    url =  f"https://{cpd_host}/v2/data_assets/{asset_id}/columns/?catalog_id={catalog_id}"
+    url =  f"https://{cpd_host}/v2/assets/{asset_id}?catalog_id={catalog_id}"
 
     response = session.get(url, headers=headers, verify=False)
 
     if response.status_code != 200:
         raise ValueError(f"Error scanning asset: {response.text}")
     else:
-        asset_columns.extend(response.json()['resources'])
-    return asset_columns
+        return response.json()['entity']
 
 
 headers = {
@@ -127,16 +139,33 @@ session = requests.Session()
 authorize()
 assets = scanCatalogDataAssets(catalog_id)
 
-with open('csv_file.csv', 'w') as f:
+"""
+This code iterates over a list of assets and query the assets one-by-one to retrieve its columns and descriptions
+
+It then loops through the list of columns for the asset and attempts to retrieve the description for each column
+from the descriptions dictionary using the column name as a key.
+
+Sample.csv (No Header: Asset Name, Column Name, Column Description)
+STUDENTS,ID, Student Identifier
+STUDENTS,NAME,Student Name
+STUDENTS,JOBROLE,Student Job Role
+
+"""
+
+with open('descr_all_assets.csv', 'w') as f:
     writer = csv.writer(f)
     for asset in assets:
         #print(asset['metadata']['asset_id'] + "," + asset['metadata']['name'])
         asset_columns = scanDataAsset(catalog_id, asset['metadata']['asset_id'])
-        for column in asset_columns:
+        columns = asset_columns['data_asset']['columns']
+        descriptions = asset_columns['column_info']
+        for column in columns:
             try:
-                row = [asset['metadata']['name'] , column['data_asset']['columns'][0]['name'] , column['column_info'][f"{column['data_asset']['columns'][0]['name']}"]['column_description']]
+                row = [asset['metadata']['name'] , column['name'] , descriptions[f"{column['name']}"]['column_description']]
             except KeyError:
-                row = [asset['metadata']['name'] , column['data_asset']['columns'][0]['name'] , None]
+                row = [asset['metadata']['name'] , column['name'] , None]
             writer.writerow(row)
+
+print("Export completed!")
 
 session.close()    
