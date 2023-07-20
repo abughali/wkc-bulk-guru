@@ -13,15 +13,14 @@ catalog_id = os.environ.get('CATALOG_ID')
 username = os.environ.get('USERNAME')
 password = os.environ.get('PASSWORD')
 env_type = os.environ.get('ENV_TYPE','SW') # Default is Software
-headers = {
-    'Content-Type': "application/json",
-    }
+auth_type = os.environ.get('AUTH_TYPE','PASSWORD') # Default is Password
 
 """
 This function generates an IBM Cloud Pak for Data bearer token using the provided credentials from the env variables above.
 
 It determines whether the environment is a cloud-based service (SaaS) or an on-premises deployment (SW) based on the `env_type` variable.
 If the environment is a cloud-based service, the function constructs an API key-based authorization URL and makes a POST request to generate a bearer token.
+Also for on-premises deployment (SW), if the Authentication type is API Key, the same 'api_key' variable will be used instead of password.
 If the environment is an on-premises deployment, the function constructs an authorization URL and payload, and makes a POST request to generate a bearer token.
 If the request is successful, the function extracts the bearer token from the response and sets the `Authorization` header of the `headers` dictionary
 to include the bearer token in the subsequent API calls.
@@ -41,17 +40,27 @@ def authorize():
 
         try:
             response = session.post(url, verify=False)
-        except requests.RequestException as e:
-            raise SystemExit("Error Authenticating : " + str(e))  
+        except:
+            raise ValueError(f"Error authenticating...")      
 
     else:
 
         url = f"https://{cpd_host}/icp4d-api/v1/authorize"
 
-        payload = {
-            "username": username,
-            "password": password
-        }
+        if auth_type == "PASSWORD":
+
+            payload = {
+                "username": username,
+                "password": password
+            }
+
+        else:
+
+            payload = {
+                "username": username,
+                "api_key": api_key
+            }
+
 
         try:
             response = session.post(url, json=payload, verify=False)
@@ -87,6 +96,9 @@ def deleteAssetById(id):
         print ("Asset deletion response: " + response.text)
 
 
+headers = {
+    'Content-Type': "application/json",
+    }
 
 session = requests.Session()
 authorize()

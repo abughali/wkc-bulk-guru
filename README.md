@@ -46,7 +46,7 @@ Following are the key use cases that are covered in this repo
 ### How do I authenticate?
 
 - Session class
-- Hostname, User, Pwd
+- Hostname, User, Pwd or API Key
 - Headers, Token
 
 ### How do I search for artefacts?
