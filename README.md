@@ -49,6 +49,10 @@ Following are the key use cases that are covered in this repo
 - Hostname, User, Pwd or API Key
 - Headers, Token
 
+### How do I generate an API Key?
+
+https://www.ibm.com/docs/en/SSQNUZ_4.6.x/cpd/get-started/api-keys.html
+
 ### How do I search for artefacts?
 
 - Using Global Search to demonstrate how to find artefacts in WKC
