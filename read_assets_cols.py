@@ -83,7 +83,7 @@ def scanCatalogDataAssets(catalog_id):
     catalog_assets = []
     payload = {
         "query":"*:*",
-        "limit":2
+        "limit":200
     }
     stop_flag = 0
 
