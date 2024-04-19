@@ -81,41 +81,26 @@ It returns the catalog_assets list containing information about all data assets 
 """
 def scanCatalogDataAssets(catalog_id):
     catalog_assets = []
-    remaining_assets_to_get = -1
-    next_param = None
+    payload = {
+        "query":"*:*",
+        "limit":2
+    }
+    stop_flag = 0
 
-    while True:
+    while stop_flag == 0:
         url = f"https://{cpd_host}/v2/asset_types/data_asset/search?catalog_id={catalog_id}"
-        if next_param:
-            url += f"&bookmark={next_param}"
-        payload = {
-            "query":"*:*",
-            "limit":200
-        }
-        response = session.post(url, headers=headers, json=payload, verify=False)
+        
+        response = requests.post(url, headers=headers, json=payload, verify=False)
 
         if response.status_code != 200:
             raise ValueError(f"Error scanning catalog: {response.text}")
         else:
             if 'next' in response.json():
-                next_param = response.json()['next']['bookmark']
-
-        if remaining_assets_to_get == -1:
-            remaining_assets_to_get = response.json()['total_rows']
-            catalog_assets.extend(response.json()['results'])
-            if remaining_assets_to_get <= payload['limit']:
-                break
+                payload = response.json()['next']
             else:
-                remaining_assets_to_get -= len(response.json()['results'])
-        elif remaining_assets_to_get < payload['limit']:
-            catalog_assets.extend(response.json()['results'][remaining_assets_to_get*-1:])
-            break
-        elif remaining_assets_to_get == payload['limit']:
-            catalog_assets.extend(response.json()['results'])
-            break
-        else:
-            catalog_assets.extend(response.json()['results'])
-            remaining_assets_to_get -= len(response.json()['results'])
+                stop_flag += 1
+
+        catalog_assets.extend(response.json()['results'])
     
     return catalog_assets
 
